@@ -2,26 +2,31 @@ import os
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
 from models import Users
-from routers.todos import db_dependency
+from routers.todos import db_dependency, get_db
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from fastapi.security import OAuth2PasswordBearer
-
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+http_bearer_scheme = HTTPBearer()
 
 
-def get_current_user(db: db_dependency, token: str = Depends(oauth2_scheme)):
+def get_current_user(
+    token: HTTPAuthorizationCredentials = Depends(http_bearer_scheme),
+    db: Session = Depends(get_db),
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid authentication credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        # Access the credentials attribute to get the token string
+        token_str = token.credentials
         payload = jwt.decode(
-            token,
+            token_str,
             os.environ.get("SECRET_KEY"),
             algorithms=[os.environ.get("ALGORITHM")],
         )
