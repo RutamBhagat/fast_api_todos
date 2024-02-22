@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import models
 from database import engine
-from routers import auth, todos, admin, users
+from routers import auth, todos, admin, users, addresses
 from dotenv import load_dotenv
 
 
@@ -30,4 +30,9 @@ app.include_router(
     users.router,
     prefix="/users",
     tags=["users"],
+)
+app.include_router(
+    addresses.router,
+    prefix="/addresses",
+    tags=["addresses"],
 )

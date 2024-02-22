@@ -39,6 +39,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         last_name=create_user_request.last_name,
         hashed_password=hashed_password,
         role=create_user_request.role,
+        phone_number=create_user_request.phone_number,
     )
     db.add(new_user)
     db.commit()
