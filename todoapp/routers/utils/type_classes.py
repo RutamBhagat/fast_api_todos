@@ -37,3 +37,16 @@ class CreateUserRequest(BaseModel):
                 "role": "user",
             }
         }
+
+
+class PasswordChangeRequest(BaseModel):
+    password: str
+    new_password: str = Field(..., min_length=6, max_length=50)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "password": "password",
+                "new_password": "new_password",
+            }
+        }
