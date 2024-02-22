@@ -1,9 +1,8 @@
 from models import Users
 from datetime import timedelta
-from fastapi import HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends
 from .utils.type_classes import CreateUserRequest
 from .utils.utility_funcs import (
-    router,
     db_dependency,
     login_dependency,
     create_access_token,
@@ -12,6 +11,7 @@ from .utils.utility_funcs import (
     verify_password,
 )
 
+router = APIRouter()
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
@@ -66,7 +66,7 @@ async def login(db: db_dependency, login_data: login_dependency):
 
     # Generate the JWT token using the new function
     token = create_access_token(
-        data={"id": user_model.id, "sub": user_model.username},
+        data={"id": user_model.id, "sub": user_model.username, "role": user_model.role},
         expires_delta=TOKEN_EXPIRATION_TIME,
     )
 

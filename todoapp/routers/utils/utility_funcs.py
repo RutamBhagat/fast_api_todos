@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
 from database import SessionLocal
@@ -11,7 +11,6 @@ from jose import jwt
 from datetime import datetime, timedelta
 
 
-router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -66,6 +65,7 @@ def get_current_user(
         user = db.query(Users).filter(Users.username == username).first()
         if user is None:
             raise credentials_exception
+        del user.hashed_password
         return user
     except JWTError:
         raise credentials_exception

@@ -1,9 +1,10 @@
 from models import Todo
-from fastapi import HTTPException, Path, status
+from fastapi import APIRouter, HTTPException, Path, status
 from .utils.type_classes import Todo_Request
-from .utils.utility_funcs import db_dependency, user_dependency, router
+from .utils.utility_funcs import db_dependency, user_dependency
 
 
+router = APIRouter()
 todo_not_found = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Todo not found for given user",
