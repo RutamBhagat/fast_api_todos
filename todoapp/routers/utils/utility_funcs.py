@@ -65,12 +65,11 @@ def get_current_user(
         user = db.query(Users).filter(Users.username == username).first()
         if user is None:
             raise credentials_exception
-        del user.hashed_password
         return user
     except JWTError:
         raise credentials_exception
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[Users, Depends(get_current_user)]
+user_dependency = Annotated[Session, Depends(get_current_user)]
 login_dependency = Annotated[OAuth2PasswordRequestForm, Depends()]
