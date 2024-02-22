@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 import models
 from database import engine
-from routers import auth, todos, admin
+from routers import auth, todos, admin, users
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -24,4 +25,9 @@ app.include_router(
     admin.router,
     prefix="/admin",
     tags=["admin"],
+)
+app.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"],
 )

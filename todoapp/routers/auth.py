@@ -1,17 +1,17 @@
 from models import Users
 from datetime import timedelta
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status
 from .utils.type_classes import CreateUserRequest
 from .utils.utility_funcs import (
     db_dependency,
     login_dependency,
     create_access_token,
-    get_current_user,
     get_password_hash,
     verify_password,
 )
 
 router = APIRouter()
+
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
@@ -91,8 +91,3 @@ async def remove_user(db: db_dependency, login_data: login_dependency):
     # Remove the user
     db.delete(user_model)
     db.commit()
-
-
-@router.get("/me")
-async def read_users_me(current_user: Users = Depends(get_current_user)):
-    return current_user
