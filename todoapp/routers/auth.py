@@ -1,89 +1,20 @@
-import os
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel
+from typing import Annotated
+from fastapi import HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from models import Users
-from routers.todos import db_dependency, get_db
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-http_bearer_scheme = HTTPBearer()
-
-
-def get_current_user(
-    token: HTTPAuthorizationCredentials = Depends(http_bearer_scheme),
-    db: Session = Depends(get_db),
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        # Access the credentials attribute to get the token string
-        token_str = token.credentials
-        payload = jwt.decode(
-            token_str,
-            os.environ.get("SECRET_KEY"),
-            algorithms=[os.environ.get("ALGORITHM")],
-        )
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        user = db.query(Users).filter(Users.username == username).first()
-        if user is None:
-            raise credentials_exception
-        return user
-    except JWTError:
-        raise credentials_exception
+from datetime import timedelta
+from .utils.type_classes import CreateUserRequest, UserLoginRequest
+from .utils.utility_funcs import (
+    router,
+    db_dependency,
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+    verify_password,
+)
 
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-router = APIRouter()
-
-
-class CreateUserRequest(BaseModel):
-    username: str
-    email: str
-    first_name: str
-    last_name: str
-    password: str
-    role: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "username": "anonymous",
-                "email": "anonymous@gmail.com",
-                "first_name": "anonymous_first_name",
-                "last_name": "anonymous_last_name",
-                "password": "password",
-                "role": "user",
-            }
-        }
-
-
-class UserLoginRequest(BaseModel):
-    username: str
-    password: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {"username": "anonymous", "password": "password"}
-        }
-
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     # Check if user already exists, both username and email should be unique
     existing_user = (
@@ -118,9 +49,13 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-async def login(db: db_dependency, user: UserLoginRequest):
-    user_model = db.query(Users).filter(Users.username == user.username).first()
-    is_password_matching = verify_password(user.password, user_model.hashed_password)
+async def login(
+    db: db_dependency, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+):
+    user_model = db.query(Users).filter(Users.username == form_data.username).first()
+    is_password_matching = verify_password(
+        form_data.password, user_model.hashed_password
+    )
 
     if not user_model or not is_password_matching:
         raise HTTPException(
@@ -129,21 +64,13 @@ async def login(db: db_dependency, user: UserLoginRequest):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Define the secret key and the algorithm used to sign the JWT
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-    ALGORITHM = os.environ.get("ALGORITHM")
-
     # Define the token expiration time
     TOKEN_EXPIRATION_TIME = timedelta(hours=48)
 
-    # Generate the JWT token
-    token = jwt.encode(
-        {
-            "sub": user.username,
-            "exp": datetime.utcnow() + TOKEN_EXPIRATION_TIME,
-        },
-        SECRET_KEY,
-        algorithm=ALGORITHM,
+    # Generate the JWT token using the new function
+    token = create_access_token(
+        data={"id": user_model.id, "sub": user_model.username},
+        expires_delta=TOKEN_EXPIRATION_TIME,
     )
 
     # Return the token

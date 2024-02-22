@@ -1,60 +1,33 @@
-from typing import Annotated
-from fastapi import Depends, HTTPException, Path, status, APIRouter
-from pydantic import BaseModel, Field
+from fastapi import HTTPException, Path, status, APIRouter
 from models import Todo
-from database import SessionLocal
-from sqlalchemy.orm import Session
-
-router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# this is just a type hint
-db_dependency = Annotated[Session, Depends(get_db)]
-
-
-class Todo_Request(BaseModel):
-    title: str = Field(..., min_length=3, max_length=50)
-    description: str = Field(..., min_length=3, max_length=100)
-    priority: int = Field(..., ge=0, le=5)
-    completed: bool = False
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "title": "Now to do chores",
-                "description": "Wash the clothes and hang them to dry",
-                "priority": 3,
-                "completed": False,
-            }
-        }
+from .utils.utility_funcs import db_dependency, user_dependency, router
+from .utils.type_classes import Todo_Request
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(Todo).all()
+async def read_all(user: user_dependency, db: db_dependency):
+    todos = db.query(Todo).filter(Todo.owner_id == user.id).all()
+    return todos
 
 
 @router.get("/{todo_id}", status_code=status.HTTP_200_OK)
-async def read_one_todo(db: db_dependency, todo_id: int = Path(..., ge=1)):
-    todo_model = db.query(Todo).filter(Todo.id == todo_id).first()
-    if todo_model is None:
+async def read_one_todo(
+    user: user_dependency, db: db_dependency, todo_id: int = Path(..., ge=1)
+):
+    todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
+    if todo is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found for given user",
         )
-    return todo_model
+    return todo
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_new_todo(db: db_dependency, new_todo: Todo_Request):
-    todo = Todo(**new_todo.model_dump())
+async def create_new_todo(
+    user: user_dependency, db: db_dependency, new_todo: Todo_Request
+):
+    todo = Todo(**new_todo.model_dump(), owner_id=user.id)
     db.add(todo)
     db.commit()
     db.refresh(todo)
@@ -63,12 +36,16 @@ async def create_new_todo(db: db_dependency, new_todo: Todo_Request):
 # Todo put request
 @router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
-    db: db_dependency, updated_todo: Todo_Request, todo_id: int = Path(..., ge=1)
+    user: user_dependency,
+    db: db_dependency,
+    updated_todo: Todo_Request,
+    todo_id: int = Path(..., ge=1),
 ):
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
     if todo is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found for given user",
         )
     todo.title = updated_todo.title
     todo.description = updated_todo.description
@@ -80,11 +57,14 @@ async def update_todo(
 
 # Todo delete request
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(db: db_dependency, todo_id: int = Path(..., ge=1)):
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+async def delete_todo(
+    user: user_dependency, db: db_dependency, todo_id: int = Path(..., ge=1)
+):
+    todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
     if todo is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found for given user",
         )
     db.delete(todo)
     db.commit()
