@@ -37,13 +37,3 @@ class CreateUserRequest(BaseModel):
                 "role": "user",
             }
         }
-
-
-class UserLoginRequest(BaseModel):
-    username: str
-    password: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {"username": "anonymous", "password": "password"}
-        }

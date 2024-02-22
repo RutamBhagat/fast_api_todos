@@ -1,6 +1,6 @@
 import os
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
 from database import SessionLocal
 from passlib.context import CryptContext
@@ -73,3 +73,4 @@ def get_current_user(
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[Users, Depends(get_current_user)]
+login_dependency = Annotated[OAuth2PasswordRequestForm, Depends()]

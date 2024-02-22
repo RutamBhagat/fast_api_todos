@@ -1,12 +1,11 @@
-from typing import Annotated
-from fastapi import HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm
 from models import Users
 from datetime import timedelta
-from .utils.type_classes import CreateUserRequest, UserLoginRequest
+from fastapi import HTTPException, status, Depends
+from .utils.type_classes import CreateUserRequest
 from .utils.utility_funcs import (
     router,
     db_dependency,
+    login_dependency,
     create_access_token,
     get_current_user,
     get_password_hash,
@@ -49,12 +48,10 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-async def login(
-    db: db_dependency, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-):
-    user_model = db.query(Users).filter(Users.username == form_data.username).first()
+async def login(db: db_dependency, login_data: login_dependency):
+    user_model = db.query(Users).filter(Users.username == login_data.username).first()
     is_password_matching = verify_password(
-        form_data.password, user_model.hashed_password
+        login_data.password, user_model.hashed_password
     )
 
     if not user_model or not is_password_matching:
@@ -78,9 +75,11 @@ async def login(
 
 
 @router.delete("/remove_user", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_user(db: db_dependency, user: UserLoginRequest):
-    user_model = db.query(Users).filter(Users.username == user.username).first()
-    is_password_matching = verify_password(user.password, user_model.hashed_password)
+async def remove_user(db: db_dependency, login_data: login_dependency):
+    user_model = db.query(Users).filter(Users.username == login_data.username).first()
+    is_password_matching = verify_password(
+        login_data.password, user_model.hashed_password
+    )
 
     if not user_model or not is_password_matching:
         raise HTTPException(

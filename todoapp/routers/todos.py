@@ -1,7 +1,13 @@
-from fastapi import HTTPException, Path, status, APIRouter
 from models import Todo
-from .utils.utility_funcs import db_dependency, user_dependency, router
+from fastapi import HTTPException, Path, status
 from .utils.type_classes import Todo_Request
+from .utils.utility_funcs import db_dependency, user_dependency, router
+
+
+todo_not_found = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Todo not found for given user",
+)
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
@@ -16,10 +22,7 @@ async def read_one_todo(
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found for given user",
-        )
+        raise todo_not_found
     return todo
 
 
@@ -43,10 +46,7 @@ async def update_todo(
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found for given user",
-        )
+        raise todo_not_found
     todo.title = updated_todo.title
     todo.description = updated_todo.description
     todo.priority = updated_todo.priority
@@ -62,9 +62,6 @@ async def delete_todo(
 ):
     todo = db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user.id).first()
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found for given user",
-        )
+        raise todo_not_found
     db.delete(todo)
     db.commit()
