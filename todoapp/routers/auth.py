@@ -43,18 +43,27 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    del new_user.hashed_password
-    return new_user
+    # Define the token expiration time
+    TOKEN_EXPIRATION_TIME = timedelta(hours=48)
+
+    # Generate the JWT token using the new function
+    token = create_access_token(
+        data={"id": new_user.id, "sub": new_user.username, "role": new_user.role},
+        expires_delta=TOKEN_EXPIRATION_TIME,
+    )
+
+    # Return the token
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(db: db_dependency, login_data: login_dependency):
-    user_model = db.query(Users).filter(Users.username == login_data.username).first()
+    new_user = db.query(Users).filter(Users.username == login_data.username).first()
     is_password_matching = verify_password(
-        login_data.password, user_model.hashed_password
+        login_data.password, new_user.hashed_password
     )
 
-    if not user_model or not is_password_matching:
+    if not new_user or not is_password_matching:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -66,7 +75,7 @@ async def login(db: db_dependency, login_data: login_dependency):
 
     # Generate the JWT token using the new function
     token = create_access_token(
-        data={"id": user_model.id, "sub": user_model.username, "role": user_model.role},
+        data={"id": new_user.id, "sub": new_user.username, "role": new_user.role},
         expires_delta=TOKEN_EXPIRATION_TIME,
     )
 
