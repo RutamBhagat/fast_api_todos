@@ -1,6 +1,6 @@
-from models import Users
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
+from app.models import Users
 from .utils.type_classes import CreateUserRequest
 from .utils.utility_funcs import (
     db_dependency,

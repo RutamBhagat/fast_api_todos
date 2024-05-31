@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Path, status
 from .utils.utility_funcs import user_dependency, db_dependency
-from models import Todo
+from app.models import Todo
 
 router = APIRouter()
 

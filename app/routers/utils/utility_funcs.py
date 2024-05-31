@@ -2,12 +2,11 @@ import os
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
-from database import SessionLocal
+from app.database import SessionLocal
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
-from models import Users
-from jose import jwt
+from app.models import Users
 from datetime import datetime, timedelta
 
 

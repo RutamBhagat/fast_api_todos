@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-import models
-from database import engine
-from routers import auth, todos, admin, users, addresses
+from fastapi.responses import RedirectResponse
+from app.database import engine
+from app.routers import auth, todos, admin, users, addresses
 from dotenv import load_dotenv
+
+from app import models
 
 
 load_dotenv()
@@ -36,3 +38,8 @@ app.include_router(
     prefix="/addresses",
     tags=["addresses"],
 )
+
+
+@app.get("/")
+async def redirect_root_to_docs():
+    return RedirectResponse("/docs")

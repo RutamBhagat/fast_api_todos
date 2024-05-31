@@ -3,8 +3,8 @@ import sys
 sys.path.append("..")
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, status
-from models import Addresses, Users
-from database import engine, SessionLocal
+from app.models import Addresses, Users
+from app.database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from .utils.utility_funcs import user_dependency, db_dependency

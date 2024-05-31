@@ -1,4 +1,4 @@
-from models import Todo
+from app.models import Todo
 from fastapi import APIRouter, HTTPException, Path, status
 from .utils.type_classes import Todo_Request
 from .utils.utility_funcs import db_dependency, user_dependency
