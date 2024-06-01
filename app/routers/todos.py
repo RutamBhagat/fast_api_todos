@@ -1,7 +1,7 @@
 from app.models import DBTodo
 from fastapi import APIRouter, HTTPException, Path, status
 from app.routers.utils.type_classes import Todo_Request
-from app.routers.utils.dependencies import db_dependency, user_dependency
+from app.dependencies import db_dependency, user_dependency
 
 
 router = APIRouter(prefix="/todos", tags=["todos"])

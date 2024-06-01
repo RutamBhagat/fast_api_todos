@@ -2,7 +2,7 @@ from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
 from app.models import DBUsers
 from app.routers.utils.type_classes import CreateUserRequest
-from app.routers.utils.dependencies import (
+from app.dependencies import (
     db_dependency,
     login_dependency,
     create_access_token,
