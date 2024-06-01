@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Path, status
 from app.routers.utils.utility_funcs import user_dependency, db_dependency
-from app.models import Todo
+from app.models import DBTodo
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -12,7 +12,7 @@ async def read_all(user: user_dependency, db: db_dependency):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed",
         )
-    return db.query(Todo).all()
+    return db.query(DBTodo).all()
 
 
 @router.delete("/todo/{todo_id}", status_code=status.HTTP_200_OK)
@@ -24,12 +24,12 @@ async def delete_todo(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed",
         )
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    todo = db.query(DBTodo).filter(DBTodo.id == todo_id).first()
     if todo is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found",
+            detail="DBTodo not found",
         )
     db.delete(todo)
     db.commit()
-    return {"message": f"Todo item with ID {todo_id} has been successfully deleted."}
+    return {"message": f"DBTodo item with ID {todo_id} has been successfully deleted."}

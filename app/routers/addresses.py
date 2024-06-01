@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from app.models import Addresses
+from app.models import DBAddresses
 from app.routers.utils.utility_funcs import user_dependency, db_dependency
 from app.routers.utils.type_classes import Address_Request
 
@@ -13,7 +13,7 @@ async def create_address(
     user: user_dependency,
     address_request: Address_Request,
 ):
-    new_address = Addresses(
+    new_address = DBAddresses(
         address1=address_request.address1,
         address2=address_request.address2,
         city=address_request.city,

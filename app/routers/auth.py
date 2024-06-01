@@ -1,6 +1,6 @@
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
-from app.models import Users
+from app.models import DBUsers
 from app.routers.utils.type_classes import CreateUserRequest
 from app.routers.utils.utility_funcs import (
     db_dependency,
@@ -17,10 +17,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     # Check if user already exists, both username and email should be unique
     existing_user = (
-        db.query(Users)
+        db.query(DBUsers)
         .filter(
-            Users.username == create_user_request.username
-            or Users.email == create_user_request.email
+            DBUsers.username == create_user_request.username
+            or DBUsers.email == create_user_request.email
         )
         .first()
     )
@@ -32,7 +32,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         )
 
     hashed_password = get_password_hash(create_user_request.password)
-    new_user = Users(
+    new_user = DBUsers(
         username=create_user_request.username,
         email=create_user_request.email,
         first_name=create_user_request.first_name,
@@ -59,7 +59,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(db: db_dependency, login_data: login_dependency):
-    new_user = db.query(Users).filter(Users.username == login_data.username).first()
+    new_user = db.query(DBUsers).filter(DBUsers.username == login_data.username).first()
     is_password_matching = verify_password(
         login_data.password, new_user.hashed_password
     )
@@ -86,7 +86,7 @@ async def login(db: db_dependency, login_data: login_dependency):
 
 @router.delete("/remove_user", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_user(db: db_dependency, login_data: login_dependency):
-    user_model = db.query(Users).filter(Users.username == login_data.username).first()
+    user_model = db.query(DBUsers).filter(DBUsers.username == login_data.username).first()
     is_password_matching = verify_password(
         login_data.password, user_model.hashed_password
     )

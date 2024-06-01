@@ -6,7 +6,7 @@ from app.database import SessionLocal
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
-from app.models import Users
+from app.models import DBUsers
 from datetime import datetime, timedelta
 
 
@@ -61,7 +61,7 @@ def get_current_user(
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        user = db.query(Users).filter(Users.username == username).first()
+        user = db.query(DBUsers).filter(DBUsers.username == username).first()
         if user is None:
             raise credentials_exception
         return user

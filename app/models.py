@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 
-class Users(Base):
+class DBUsers(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -17,11 +17,11 @@ class Users(Base):
     phone_number = Column(String)
     address_id = Column(Integer, ForeignKey("addresses.id"), nullable=True)
 
-    todos = relationship("Todo", back_populates="owner")
-    address = relationship("Addresses", back_populates="users")  # Corrected here
+    todos = relationship("DBTodo", back_populates="owner")
+    address = relationship("DBAddresses", back_populates="users")  # Corrected here
 
 
-class Todo(Base):
+class DBTodo(Base):
     __tablename__ = "todos"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -31,10 +31,10 @@ class Todo(Base):
     completed = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("Users", back_populates="todos")
+    owner = relationship("DBUsers", back_populates="todos")
 
 
-class Addresses(Base):
+class DBAddresses(Base):
     __tablename__ = "addresses"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -46,4 +46,4 @@ class Addresses(Base):
     postalcode = Column(String)
     apt_num = Column(String, nullable=True)
 
-    users = relationship("Users", back_populates="address")  # Corrected here
+    users = relationship("DBUsers", back_populates="address")  # Corrected here
