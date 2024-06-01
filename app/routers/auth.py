@@ -1,6 +1,6 @@
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
-from app.auth import get_password_hash, verify_password, create_access_token
+from app.auth.auth import get_password_hash, verify_password, create_access_token
 from app.db.models import DBUsers
 from app.db.schema import UserBase
 from app.dependencies import db_dependency,login_dependency

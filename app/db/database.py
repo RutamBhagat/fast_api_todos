@@ -7,7 +7,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 _ = load_dotenv(find_dotenv())
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+# SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+SQLALCHEMY_DATABASE_URL = "sqlite:///./fastapi-test.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
