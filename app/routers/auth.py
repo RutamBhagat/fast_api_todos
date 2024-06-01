@@ -1,14 +1,9 @@
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
+from app.auth import get_password_hash, verify_password, create_access_token
 from app.models import DBUsers
 from app.schema import CreateUserRequest
-from app.dependencies import (
-    db_dependency,
-    login_dependency,
-    create_access_token,
-    get_password_hash,
-    verify_password,
-)
+from app.dependencies import db_dependency,login_dependency
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

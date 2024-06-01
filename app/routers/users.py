@@ -1,12 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.schema import PasswordChangeRequest
-from app.dependencies import (
-    db_dependency,
-    user_dependency,
-    verify_password,
-    get_password_hash,
-)
+from app.dependencies import db_dependency, user_dependency
+from app.auth import verify_password, get_password_hash
 
 router = APIRouter(prefix="/users", tags=["users"])
 
