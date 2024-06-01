@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Path, status
-from app.db.schema import TodoBase
+from app.db.schema import TodoBase, TodoDisplay
 from app.dependencies import db_dependency, user_dependency
 from app.db.access_layers import db_todos
 
@@ -11,34 +11,34 @@ todo_not_found = HTTPException(
 )
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[TodoBase])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[TodoDisplay])
 async def read_all(db: db_dependency, user: user_dependency):
-    return db_todos.get_todos(db, user)
+    return await db_todos.get_todos(db, user)
 
 
-@router.get("/{todo_id}", status_code=status.HTTP_200_OK, response_model=TodoBase)
+@router.get("/{todo_id}", status_code=status.HTTP_200_OK, response_model=TodoDisplay)
 async def read_one_todo(
     db: db_dependency, user: user_dependency, todo_id: int = Path(..., ge=1)
 ):
-    return db_todos.get_todo(db, user, todo_id)
+    return await db_todos.get_todo(db, user, todo_id)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TodoBase)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TodoDisplay)
 async def create_new_todo(
     db: db_dependency, user: user_dependency, new_todo: TodoBase
 ):
-    return db_todos.create_todo(db, user, new_todo)
+    return await db_todos.create_todo(db, user, new_todo)
 
 
 # DBTodo put request
-@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=TodoBase)
+@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
     db: db_dependency,
     user: user_dependency,
     updated_todo: TodoBase,
     todo_id: int = Path(..., ge=1),
 ):
-    return db_todos.update_todo(db, user, updated_todo, todo_id)
+    db_todos.update_todo(db, user, updated_todo, todo_id)
 
 
 # DBTodo delete request
@@ -46,4 +46,4 @@ async def update_todo(
 async def delete_todo(
     db: db_dependency, user: user_dependency, todo_id: int = Path(..., ge=1)
 ):
-    return db_todos.delete_todo(db, user, todo_id)
+    db_todos.delete_todo(db, user, todo_id)

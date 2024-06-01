@@ -18,6 +18,28 @@ class TodoBase(BaseModel):
             }
         }
 
+# User inside TodoDisplay
+class User(BaseModel):
+    id: int
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    role: str
+    phone_number: str
+
+    class Config:
+        orm_mode = True
+
+class TodoDisplay(BaseModel):
+    title: str
+    description: str
+    priority: int
+    is_completed: bool
+    owner: User
+
+    class Config:
+        orm_mode = True
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
