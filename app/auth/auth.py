@@ -7,7 +7,6 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from app.db.models import DBUsers
 from app.db.database import get_db
-from app.dependencies import oauth2_scheme
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
