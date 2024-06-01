@@ -97,3 +97,6 @@ GitHub.sublime-settings
 *.DS_Store
 Thumbs.db
 node_modules/
+
+# SQLite Database
+fastapi-test.db
