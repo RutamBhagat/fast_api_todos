@@ -2,24 +2,16 @@ import os
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
-from app.database import SessionLocal
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
+from app.database import get_db
 from app.models import DBUsers
 from datetime import datetime, timedelta
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def get_password_hash(password):

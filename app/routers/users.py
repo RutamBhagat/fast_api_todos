@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.routers.utils.type_classes import PasswordChangeRequest
-from app.routers.utils.utility_funcs import (
+from app.routers.utils.dependencies import (
     db_dependency,
     user_dependency,
     verify_password,

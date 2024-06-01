@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from app.models import DBAddresses
-from app.routers.utils.utility_funcs import user_dependency, db_dependency
+from app.routers.utils.dependencies import user_dependency, db_dependency
 from app.routers.utils.type_classes import Address_Request
 
 
