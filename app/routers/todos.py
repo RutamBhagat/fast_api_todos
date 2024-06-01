@@ -1,6 +1,6 @@
 from app.db.models import DBTodo
 from fastapi import APIRouter, HTTPException, Path, status
-from app.db.schema import Todo_Request
+from app.db.schema import TodoBase
 from app.dependencies import db_dependency, user_dependency
 
 
@@ -29,7 +29,7 @@ async def read_one_todo(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_new_todo(
-    user: user_dependency, db: db_dependency, new_todo: Todo_Request
+    user: user_dependency, db: db_dependency, new_todo: TodoBase
 ):
     todo = DBTodo(**new_todo.model_dump(), owner_id=user.id)
     db.add(todo)
@@ -42,7 +42,7 @@ async def create_new_todo(
 async def update_todo(
     user: user_dependency,
     db: db_dependency,
-    updated_todo: Todo_Request,
+    updated_todo: TodoBase,
     todo_id: int = Path(..., ge=1),
 ):
     todo = db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.owner_id == user.id).first()

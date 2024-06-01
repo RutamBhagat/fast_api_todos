@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class Todo_Request(BaseModel):
+class TodoBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=50)
     description: str = Field(..., min_length=3, max_length=100)
     priority: int = Field(..., ge=0, le=5)
@@ -19,7 +19,7 @@ class Todo_Request(BaseModel):
         }
 
 
-class CreateUserRequest(BaseModel):
+class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=3, max_length=50)
@@ -42,7 +42,7 @@ class CreateUserRequest(BaseModel):
         }
 
 
-class PasswordChangeRequest(BaseModel):
+class ChangePasswordBase(BaseModel):
     password: str
     new_password: str = Field(..., min_length=6, max_length=50)
 
@@ -55,7 +55,7 @@ class PasswordChangeRequest(BaseModel):
         }
 
 
-class Address_Request(BaseModel):
+class AddressBase(BaseModel):
     address1: str = Field(..., min_length=1, max_length=50)
     address2: str = Field(..., min_length=1, max_length=50)
     city: str = Field(..., min_length=1, max_length=50)
