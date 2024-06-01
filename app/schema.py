@@ -1,5 +1,4 @@
 from typing import Optional
-from click import Option
 from pydantic import BaseModel, Field
 
 

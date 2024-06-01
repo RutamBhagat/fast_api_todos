@@ -1,6 +1,6 @@
 from app.models import DBTodo
 from fastapi import APIRouter, HTTPException, Path, status
-from app.routers.utils.schema import Todo_Request
+from app.schema import Todo_Request
 from app.dependencies import db_dependency, user_dependency
 
 
