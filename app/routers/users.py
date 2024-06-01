@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException, status
 
-from .utils.type_classes import PasswordChangeRequest
-from .utils.utility_funcs import (
+from app.routers.utils.type_classes import PasswordChangeRequest
+from app.routers.utils.utility_funcs import (
     db_dependency,
     user_dependency,
     verify_password,
     get_password_hash,
 )
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", status_code=status.HTTP_200_OK)

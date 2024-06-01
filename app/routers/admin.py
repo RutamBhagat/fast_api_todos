@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Path, status
-from .utils.utility_funcs import user_dependency, db_dependency
+from app.routers.utils.utility_funcs import user_dependency, db_dependency
 from app.models import Todo
 
-router = APIRouter()
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/todo", status_code=status.HTTP_200_OK)

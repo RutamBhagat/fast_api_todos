@@ -1,17 +1,10 @@
-import sys
-
-sys.path.append("..")
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Depends, status
-from app.models import Addresses, Users
-from app.database import engine, SessionLocal
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from .utils.utility_funcs import user_dependency, db_dependency
-from .utils.type_classes import Address_Request
+from fastapi import APIRouter, status
+from app.models import Addresses
+from app.routers.utils.utility_funcs import user_dependency, db_dependency
+from app.routers.utils.type_classes import Address_Request
 
 
-router = APIRouter()
+router = APIRouter(prefix="/addresses", tags=["addresses"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)

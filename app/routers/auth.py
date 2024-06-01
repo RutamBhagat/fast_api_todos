@@ -1,8 +1,8 @@
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, status
 from app.models import Users
-from .utils.type_classes import CreateUserRequest
-from .utils.utility_funcs import (
+from app.routers.utils.type_classes import CreateUserRequest
+from app.routers.utils.utility_funcs import (
     db_dependency,
     login_dependency,
     create_access_token,
@@ -10,7 +10,7 @@ from .utils.utility_funcs import (
     verify_password,
 )
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
