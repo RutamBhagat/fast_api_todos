@@ -9,7 +9,8 @@ from app.database import get_db
 from app.models import DBUsers
 from datetime import datetime, timedelta
 
-
+SECRET_KEY = os.environ.get("SECRET_KEY")
+ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -30,7 +31,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, os.environ.get("SECRET_KEY"), algorithm=os.environ.get("ALGORITHM")
+        to_encode, SECRET_KEY, algorithm=ALGORITHM
     )
     return encoded_jwt
 
@@ -47,8 +48,8 @@ def get_current_user(
         # The token is already extracted from the Authorization header by OAuth2PasswordBearer
         payload = jwt.decode(
             token,
-            os.environ.get("SECRET_KEY"),
-            algorithms=[os.environ.get("ALGORITHM")],
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
         )
         username: str = payload.get("sub")
         if username is None:
