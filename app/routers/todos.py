@@ -38,7 +38,7 @@ async def update_todo(
     updated_todo: TodoBase,
     todo_id: int = Path(..., ge=1),
 ):
-    db_todos.update_todo(db, user, updated_todo, todo_id)
+    await db_todos.update_todo(db, user, updated_todo, todo_id)
 
 
 # DBTodo delete request
@@ -46,4 +46,4 @@ async def update_todo(
 async def delete_todo(
     db: db_dependency, user: user_dependency, todo_id: int = Path(..., ge=1)
 ):
-    db_todos.delete_todo(db, user, todo_id)
+    await db_todos.delete_todo(db, user, todo_id)

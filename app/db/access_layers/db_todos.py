@@ -38,6 +38,6 @@ async def update_todo(db: Session, request: UserBase, todo: TodoBase, todo_id: i
 
 # delete a todo
 async def delete_todo(db: Session, request: UserBase, todo_id: int) -> None:
-    todo = await get_todo(db, request, todo_id) # This is where you reuse the above function
+    todo = await get_todo(db, request, todo_id)
     db.delete(todo)
     db.commit()

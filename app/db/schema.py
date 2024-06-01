@@ -32,6 +32,7 @@ class User(BaseModel):
         orm_mode = True
 
 class TodoDisplay(BaseModel):
+    id: int
     title: str
     description: str
     priority: int
