@@ -6,6 +6,6 @@ from app.auth.auth import get_current_user
 from app.db.database import get_db
 
 
-login_dependency = Annotated[OAuth2PasswordRequestForm, Depends()]
+login_dependency = Annotated[OAuth2PasswordRequestForm, Depends()] # NOTE: The Depends() does not need any params
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[Session, Depends(get_current_user)]
