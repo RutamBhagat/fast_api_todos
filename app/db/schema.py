@@ -6,7 +6,7 @@ class TodoBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=50)
     description: str = Field(..., min_length=3, max_length=100)
     priority: int = Field(..., ge=0, le=5)
-    completed: bool = False
+    is_completed: bool = False
 
     class Config:
         json_schema_extra = {
@@ -14,7 +14,7 @@ class TodoBase(BaseModel):
                 "title": "Now to do chores",
                 "description": "Wash the clothes and hang them to dry",
                 "priority": 3,
-                "completed": False,
+                "is_completed": False,
             }
         }
 

@@ -1,6 +1,6 @@
-from app.db.database import Base
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
+from app.db.database import Base
 
 
 class DBUsers(Base):
@@ -18,7 +18,7 @@ class DBUsers(Base):
     address_id = Column(Integer, ForeignKey("addresses.id"), nullable=True)
 
     todos = relationship("DBTodo", back_populates="owner")
-    address = relationship("DBAddresses", back_populates="users")  # Corrected here
+    address = relationship("DBAddresses", back_populates="users")
 
 
 class DBTodo(Base):
@@ -28,7 +28,7 @@ class DBTodo(Base):
     title = Column(String)
     description = Column(String)
     priority = Column(Integer)
-    completed = Column(Boolean, default=False)
+    is_completed = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("DBUsers", back_populates="todos")
@@ -38,7 +38,7 @@ class DBAddresses(Base):
     __tablename__ = "addresses"
 
     id = Column(Integer, primary_key=True, index=True)
-    address1 = Column(String)  # Corrected typo here
+    address1 = Column(String)
     address2 = Column(String)
     city = Column(String)
     state = Column(String)
@@ -46,4 +46,4 @@ class DBAddresses(Base):
     postalcode = Column(String)
     apt_num = Column(String, nullable=True)
 
-    users = relationship("DBUsers", back_populates="address")  # Corrected here
+    users = relationship("DBUsers", back_populates="address")

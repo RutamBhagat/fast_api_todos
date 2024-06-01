@@ -51,7 +51,7 @@ async def update_todo(
     todo.title = updated_todo.title
     todo.description = updated_todo.description
     todo.priority = updated_todo.priority
-    todo.completed = updated_todo.completed
+    todo.is_completed = updated_todo.is_completed
     db.commit()
     db.refresh(todo)
 
