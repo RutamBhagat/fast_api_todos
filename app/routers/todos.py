@@ -4,7 +4,7 @@ from app.routers.utils.type_classes import Todo_Request
 from app.routers.utils.utility_funcs import db_dependency, user_dependency
 
 
-router = APIRouter(prefix="/todos",tags=["todos"])
+router = APIRouter(prefix="/todos", tags=["todos"])
 todo_not_found = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Todo not found for given user",
