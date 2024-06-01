@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from app import models
-from app.database import engine
+from app.db import models
+from app.db.database import engine
 from app.routers import auth, todos, admin, users, addresses
 
 

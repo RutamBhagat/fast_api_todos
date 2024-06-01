@@ -4,8 +4,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from app.models import DBUsers
-from app.database import get_db
+from app.db.models import DBUsers
+from app.db.database import get_db
 from app.dependencies import oauth2_scheme
 
 
