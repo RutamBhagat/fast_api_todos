@@ -10,12 +10,12 @@ todo_not_found = HTTPException(
 
 # read all todos for a user
 async def get_todos(db: Session, request: UserBase) -> list[DBTodo]:
-    return await db.query(DBTodo).filter(DBTodo.user_id == request.id).all()
+    return db.query(DBTodo).filter(DBTodo.owner_id == request.id).all()
 
 
 # read a single todo for a user
 async def get_todo(db: Session, request: UserBase, todo_id: int) -> DBTodo:
-    todo = await db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.user_id == request.id).first()
+    todo = await db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.owner_id == request.id).first()
     if todo is None:
         raise todo_not_found
     return todo
