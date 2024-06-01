@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from app.models import DBAddresses
 from app.dependencies import user_dependency, db_dependency
-from app.routers.utils.type_classes import Address_Request
+from app.routers.utils.schema import Address_Request
 
 
 router = APIRouter(prefix="/addresses", tags=["addresses"])
