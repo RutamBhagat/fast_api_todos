@@ -10,6 +10,7 @@ load_dotenv()
 
 app = FastAPI()
 
+# Connect to the database
 models.Base.metadata.create_all(bind=engine)
 
 app.include_router(auth.router)

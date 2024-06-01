@@ -1,7 +1,7 @@
-from app.db.models import DBTodo
 from fastapi import APIRouter, HTTPException, Path, status
 from app.db.schema import TodoBase
 from app.dependencies import db_dependency, user_dependency
+from app.db.access_layers import db_todos
 
 
 router = APIRouter(prefix="/todos", tags=["todos"])
@@ -11,58 +11,39 @@ todo_not_found = HTTPException(
 )
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(user: user_dependency, db: db_dependency):
-    todos = db.query(DBTodo).filter(DBTodo.owner_id == user.id).all()
-    return todos
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[TodoBase])
+async def read_all(db: db_dependency, user: user_dependency):
+    return db_todos.get_todos(db, user)
 
 
-@router.get("/{todo_id}", status_code=status.HTTP_200_OK)
+@router.get("/{todo_id}", status_code=status.HTTP_200_OK, response_model=TodoBase)
 async def read_one_todo(
-    user: user_dependency, db: db_dependency, todo_id: int = Path(..., ge=1)
+    db: db_dependency, user: user_dependency, todo_id: int = Path(..., ge=1)
 ):
-    todo = db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.owner_id == user.id).first()
-    if todo is None:
-        raise todo_not_found
-    return todo
+    return db_todos.get_todo(db, user, todo_id)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TodoBase)
 async def create_new_todo(
-    user: user_dependency, db: db_dependency, new_todo: TodoBase
+    db: db_dependency, user: user_dependency, new_todo: TodoBase
 ):
-    todo = DBTodo(**new_todo.model_dump(), owner_id=user.id)
-    db.add(todo)
-    db.commit()
-    db.refresh(todo)
+    return db_todos.create_todo(db, user, new_todo)
 
 
 # DBTodo put request
-@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=TodoBase)
 async def update_todo(
-    user: user_dependency,
     db: db_dependency,
+    user: user_dependency,
     updated_todo: TodoBase,
     todo_id: int = Path(..., ge=1),
 ):
-    todo = db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.owner_id == user.id).first()
-    if todo is None:
-        raise todo_not_found
-    todo.title = updated_todo.title
-    todo.description = updated_todo.description
-    todo.priority = updated_todo.priority
-    todo.is_completed = updated_todo.is_completed
-    db.commit()
-    db.refresh(todo)
+    return db_todos.update_todo(db, user, updated_todo, todo_id)
 
 
 # DBTodo delete request
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
-    user: user_dependency, db: db_dependency, todo_id: int = Path(..., ge=1)
+    db: db_dependency, user: user_dependency, todo_id: int = Path(..., ge=1)
 ):
-    todo = db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.owner_id == user.id).first()
-    if todo is None:
-        raise todo_not_found
-    db.delete(todo)
-    db.commit()
+    return db_todos.delete_todo(db, user, todo_id)
