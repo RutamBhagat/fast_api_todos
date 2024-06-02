@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
 
+from app.auth.hash import verify_password, get_password_hash
 from app.db.schema import ChangePasswordBody, UserResponse
-from app.db.hash import verify_password, get_password_hash
-from app.dependencies import db_dependency, user_dependency
 from app.db.access_layers import db_users
+from app.dependencies import db_dependency, user_dependency
 
 
 router = APIRouter(prefix="/users", tags=["users"])

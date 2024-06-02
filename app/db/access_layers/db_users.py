@@ -1,9 +1,9 @@
 from typing import Optional
 from sqlalchemy.orm.session import Session
-from app.db.hash import get_password_hash
+from fastapi import HTTPException, status
+from app.auth.hash import get_password_hash
 from app.db.models import DBUsers
 from app.db.schema import UserBody
-from fastapi import HTTPException, status
 
 user_not_found = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
