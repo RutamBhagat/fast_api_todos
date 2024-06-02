@@ -24,7 +24,7 @@ async def get_todo_from_db(db: Session, todo_id: int) -> DBTodo:
 
 # ADMIN: delete a todo from the database
 async def delete_todo_from_db(db: Session, todo_id: int) -> None:
-    todo = get_todo_from_db(db, todo_id)
+    todo = await get_todo_from_db(db, todo_id)
     db.delete(todo)
     db.commit()
 

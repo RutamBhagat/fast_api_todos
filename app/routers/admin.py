@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Path, status
 from app.dependencies import user_dependency, db_dependency
-from app.db.models import DBTodo
 from app.db.access_layers import db_todos
 
 router = APIRouter(prefix="/admin", tags=["admin"])
