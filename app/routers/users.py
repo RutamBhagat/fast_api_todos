@@ -1,23 +1,23 @@
 from fastapi import APIRouter, HTTPException, status
 
-from app.db.schema import ChangePasswordBase
+from app.db.schema import ChangePasswordBody, UserResponse
 from app.auth.auth import verify_password, get_password_hash
 from app.dependencies import db_dependency, user_dependency
+from app.db.access_layers import db_users
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/me", status_code=status.HTTP_200_OK)
-async def read_users_me(user: user_dependency):
-    print(user)
-    del user.hashed_password
+@router.get("/me", status_code=status.HTTP_200_OK, response_model=UserResponse)
+async def read_users_me(user: user_dependency) -> UserResponse:
     return user
 
 
 # change password of current user
 @router.patch("/me/change_password", status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(
-    db: db_dependency, user: user_dependency, password_change: ChangePasswordBase
+    db: db_dependency, user: user_dependency, password_change: ChangePasswordBody
 ):
     is_password_correct = verify_password(
         password_change.password, user.hashed_password
@@ -28,8 +28,6 @@ async def change_password(
             detail="Incorrect previous password",
         )
 
-    hased_password = get_password_hash(password_change.new_password)
-    user.hashed_password = hased_password
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    hashed_password = get_password_hash(password_change.new_password)
+    user.hashed_password = hashed_password
+    await db_users.update_user(db, user)

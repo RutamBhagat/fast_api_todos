@@ -5,12 +5,13 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
-from app.db.models import DBUsers
 from app.db.database import get_db
+from app.db.access_layers import db_users
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
+
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -23,20 +24,18 @@ def verify_password(plain_password, hashed_password):
     return bcrypt_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=48)):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, SECRET_KEY, algorithm=ALGORITHM
-    )
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def get_current_user(
+async def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
@@ -54,9 +53,7 @@ def get_current_user(
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        user = db.query(DBUsers).filter(DBUsers.username == username).first()
-        if user is None:
-            raise credentials_exception
+        user = await db_users.get_user(db, username)
         return user
     except JWTError:
         raise credentials_exception

@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class TodoBase(BaseModel):
+class TodoBody(BaseModel):
     title: str = Field(..., min_length=3, max_length=50)
     description: str = Field(..., min_length=3, max_length=100)
     priority: int = Field(..., ge=0, le=5)
@@ -18,7 +18,8 @@ class TodoBase(BaseModel):
             }
         }
 
-# User inside TodoDisplay
+
+# User inside TodoResponse
 class User(BaseModel):
     id: int
     username: str
@@ -31,7 +32,8 @@ class User(BaseModel):
     class Config:
         orm_mode = True
 
-class TodoDisplay(BaseModel):
+
+class TodoResponse(BaseModel):
     id: int
     title: str
     description: str
@@ -42,7 +44,8 @@ class TodoDisplay(BaseModel):
     class Config:
         orm_mode = True
 
-class UserBase(BaseModel):
+
+class UserBody(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=3, max_length=50)
@@ -65,7 +68,20 @@ class UserBase(BaseModel):
         }
 
 
-class ChangePasswordBase(BaseModel):
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    role: str
+    phone_number: str
+
+    class Config:
+        orm_mode = True
+
+
+class ChangePasswordBody(BaseModel):
     password: str
     new_password: str = Field(..., min_length=6, max_length=50)
 
@@ -78,7 +94,7 @@ class ChangePasswordBase(BaseModel):
         }
 
 
-class AddressBase(BaseModel):
+class AddressBody(BaseModel):
     address1: str = Field(..., min_length=1, max_length=50)
     address2: str = Field(..., min_length=1, max_length=50)
     city: str = Field(..., min_length=1, max_length=50)
