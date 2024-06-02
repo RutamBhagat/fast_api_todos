@@ -29,7 +29,7 @@ class DBTodo(Base):
     description = Column(String)
     priority = Column(Integer)
     is_completed = Column(Boolean, default=False)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("DBUsers", back_populates="todos")
 

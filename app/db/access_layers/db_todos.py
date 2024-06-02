@@ -31,14 +31,14 @@ async def delete_todo_from_db(db: Session, todo_id: int) -> None:
 
 # read all todos for a user
 async def get_todos(db: Session, request: UserBody) -> list[DBTodo]:
-    return db.query(DBTodo).filter(DBTodo.owner_id == request.id).all()
+    return db.query(DBTodo).filter(DBTodo.user_id == request.id).all()
 
 
 # read a single todo for a user
 async def get_todo(db: Session, request: UserBody, todo_id: int) -> DBTodo:
     todo = (
         db.query(DBTodo)
-        .filter(DBTodo.id == todo_id, DBTodo.owner_id == request.id)
+        .filter(DBTodo.id == todo_id, DBTodo.user_id == request.id)
         .first()
     )
     if todo is None:
@@ -48,7 +48,7 @@ async def get_todo(db: Session, request: UserBody, todo_id: int) -> DBTodo:
 
 # create a new todo
 async def create_todo(db: Session, request: UserBody, todo: TodoBody) -> DBTodo:
-    todo = DBTodo(**todo.model_dump(), owner_id=request.id)
+    todo = DBTodo(**todo.model_dump(), user_id=request.id)
     db.add(todo)
     db.commit()
     db.refresh(todo)
