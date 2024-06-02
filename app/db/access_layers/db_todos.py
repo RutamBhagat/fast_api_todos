@@ -55,12 +55,10 @@ async def create_todo(db: Session, user: UserBody, todo: TodoBody) -> DBTodo:
 
 # update a todo
 async def update_todo(
-    db: Session, user: UserBody, todo: TodoBody, todo_id: int
+    db: Session, user: UserBody, update_todo: TodoBody, todo_id: int
 ) -> DBTodo:
-    todo = await get_todo(
-        db, user, todo_id
-    )  # This is where you reuse the above function
-    todo.update(todo.model_dump())
+    todo = await get_todo(db, user, todo_id)
+    todo.update(update_todo.model_dump())
     db.commit()
     db.refresh(todo)
     return todo
@@ -68,8 +66,6 @@ async def update_todo(
 
 # delete a todo
 async def delete_todo(db: Session, user: UserBody, todo_id: int) -> None:
-    todo = await get_todo(
-        db, user, todo_id
-    )  # This is where you reuse the above function
+    todo = await get_todo(db, user, todo_id)
     db.delete(todo)
     db.commit()
