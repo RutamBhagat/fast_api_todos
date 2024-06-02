@@ -30,7 +30,7 @@ async def create_user(db: db_dependency, create_user_request: UserBody):
             # This is desired behavior, the user does not exist
             pass
         else:
-            raise
+            raise e
     user = await db_users.create_user(db, create_user_request)
     token = create_access_token(
         data={"id": user.id, "sub": user.username, "role": user.role},

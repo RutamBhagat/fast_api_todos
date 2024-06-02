@@ -30,16 +30,14 @@ async def delete_todo_from_db(db: Session, todo_id: int) -> None:
 
 
 # read all todos for a user
-async def get_todos(db: Session, request: UserBody) -> list[DBTodo]:
-    return db.query(DBTodo).filter(DBTodo.user_id == request.id).all()
+async def get_todos(db: Session, user: UserBody) -> list[DBTodo]:
+    return db.query(DBTodo).filter(DBTodo.user_id == user.id).all()
 
 
 # read a single todo for a user
-async def get_todo(db: Session, request: UserBody, todo_id: int) -> DBTodo:
+async def get_todo(db: Session, user: UserBody, todo_id: int) -> DBTodo:
     todo = (
-        db.query(DBTodo)
-        .filter(DBTodo.id == todo_id, DBTodo.user_id == request.id)
-        .first()
+        db.query(DBTodo).filter(DBTodo.id == todo_id, DBTodo.user_id == user.id).first()
     )
     if todo is None:
         raise todo_not_found
@@ -47,8 +45,8 @@ async def get_todo(db: Session, request: UserBody, todo_id: int) -> DBTodo:
 
 
 # create a new todo
-async def create_todo(db: Session, request: UserBody, todo: TodoBody) -> DBTodo:
-    todo = DBTodo(**todo.model_dump(), user_id=request.id)
+async def create_todo(db: Session, user: UserBody, todo: TodoBody) -> DBTodo:
+    todo = DBTodo(**todo.model_dump(), user_id=user.id)
     db.add(todo)
     db.commit()
     db.refresh(todo)
@@ -57,10 +55,10 @@ async def create_todo(db: Session, request: UserBody, todo: TodoBody) -> DBTodo:
 
 # update a todo
 async def update_todo(
-    db: Session, request: UserBody, todo: TodoBody, todo_id: int
+    db: Session, user: UserBody, todo: TodoBody, todo_id: int
 ) -> DBTodo:
     todo = await get_todo(
-        db, request, todo_id
+        db, user, todo_id
     )  # This is where you reuse the above function
     todo.update(todo.model_dump())
     db.commit()
@@ -69,9 +67,9 @@ async def update_todo(
 
 
 # delete a todo
-async def delete_todo(db: Session, request: UserBody, todo_id: int) -> None:
+async def delete_todo(db: Session, user: UserBody, todo_id: int) -> None:
     todo = await get_todo(
-        db, request, todo_id
+        db, user, todo_id
     )  # This is where you reuse the above function
     db.delete(todo)
     db.commit()
