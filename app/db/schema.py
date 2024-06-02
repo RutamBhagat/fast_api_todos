@@ -104,6 +104,7 @@ class AddressBody(BaseModel):
     apt_num: Optional[str] = Field(None, min_length=1, max_length=50)
 
     class Config:
+        orm_mode = True
         json_schema_extra = {
             "example": {
                 "address1": "1234 Main St",

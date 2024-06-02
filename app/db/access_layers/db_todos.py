@@ -1,7 +1,7 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm.session import Session
 from app.db.models import DBTodo
 from app.db.schema import TodoBody, UserBody
-from fastapi import HTTPException, status
 
 todo_not_found = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,

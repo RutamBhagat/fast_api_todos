@@ -1,6 +1,6 @@
 from typing import Optional
-from sqlalchemy.orm.session import Session
 from fastapi import HTTPException, status
+from sqlalchemy.orm.session import Session
 from app.auth.hash import get_password_hash
 from app.db.models import DBUsers
 from app.db.schema import UserBody
