@@ -1,35 +1,27 @@
 from fastapi import APIRouter, HTTPException, Path, status
 from app.dependencies import user_dependency, db_dependency
 from app.db.models import DBTodo
+from app.db.access_layers import db_todos
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+access_denied = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Access Denied",
+)
 
 
 @router.get("/todo", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency, db: db_dependency):
     if user is None or user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed",
-        )
-    return db.query(DBTodo).all()
+        raise access_denied
+    return await db_todos.get_all_todos(db)
 
 
-@router.delete("/todo/{todo_id}", status_code=status.HTTP_200_OK)
+@router.delete("/todo/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     user: user_dependency, db: db_dependency, todo_id: int = Path(..., ge=1)
 ):
     if user is None or user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed",
-        )
-    todo = db.query(DBTodo).filter(DBTodo.id == todo_id).first()
-    if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="DBTodo not found",
-        )
-    db.delete(todo)
-    db.commit()
-    return {"message": f"DBTodo item with ID {todo_id} has been successfully deleted."}
+        raise access_denied
+    await db_todos.delete_todo_from_db(db, todo_id)

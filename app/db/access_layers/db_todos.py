@@ -9,6 +9,26 @@ todo_not_found = HTTPException(
 )
 
 
+# ADMIN: read all todos from the database
+async def get_all_todos(db: Session) -> list[DBTodo]:
+    return db.query(DBTodo).all()
+
+
+# ADMIN: read one todo from the database
+async def get_todo_from_db(db: Session, todo_id: int) -> DBTodo:
+    todo = db.query(DBTodo).filter(DBTodo.id == todo_id).first()
+    if todo is None:
+        raise todo_not_found
+    return todo
+
+
+# ADMIN: delete a todo from the database
+async def delete_todo_from_db(db: Session, todo_id: int) -> None:
+    todo = get_todo_from_db(db, todo_id)
+    db.delete(todo)
+    db.commit()
+
+
 # read all todos for a user
 async def get_todos(db: Session, request: UserBody) -> list[DBTodo]:
     return db.query(DBTodo).filter(DBTodo.owner_id == request.id).all()
