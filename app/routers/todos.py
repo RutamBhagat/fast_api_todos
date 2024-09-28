@@ -5,10 +5,6 @@ from app.dependencies import db_dependency, user_dependency
 
 
 router = APIRouter(prefix="/todos", tags=["todos"])
-todo_not_found = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="DBTodo not found for given user",
-)
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[TodoResponse])
