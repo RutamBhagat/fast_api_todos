@@ -10,6 +10,14 @@ load_dotenv()
 
 app = FastAPI()
 
+
+# Run migrations on startup
+@app.on_event("startup")
+async def run_migrations():
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
+
 # Connect to the database
 models.Base.metadata.create_all(bind=engine)
 

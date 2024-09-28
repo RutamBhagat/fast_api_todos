@@ -6,6 +6,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from app.db import models
+from app.db.database import Base
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -24,6 +25,7 @@ target_metadata = models.Base.metadata
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
